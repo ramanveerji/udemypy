@@ -25,11 +25,7 @@ def get_valid_text(text):
     """
     Returns the text but with a backslash added behind all special characters
     """
-    valid_text = ""
-    for character in str(text):
-        if character in SPECIAL_CHARS:
-            valid_text += f"\\{character}"
-        else:
-            valid_text += character
-
-    return valid_text
+    return "".join(
+        f"\\{character}" if character in SPECIAL_CHARS else character
+        for character in str(text)
+    )

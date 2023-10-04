@@ -21,13 +21,11 @@ def _set_variables_value(sql_script: str, variables: dict) -> str:
         # String variable:
         if isinstance(value, str):
             sql_script = sql_script.replace(variable, f"'{value}'")
-        # Datetime variable:
         elif isinstance(value, datetime):
             value_str = value.strftime("%Y-%m-%d %H:%M:%S")
             sql_script = sql_script.replace(variable, f"'{value_str}'")
-        # Null variable:
         elif value is None:
-            sql_script = sql_script.replace(variable, f"NULL")
+            sql_script = sql_script.replace(variable, "NULL")
         else:
             sql_script = sql_script.replace(variable, str(value))
 
@@ -35,11 +33,8 @@ def _set_variables_value(sql_script: str, variables: dict) -> str:
 
 
 def read_script(filename: str, variables: dict = None) -> list[str]:
-    # Open and read the file as a single buffer
-    fd = open(filename, "r")
-    sql_script = fd.read()
-    fd.close()
-
+    with open(filename, "r") as fd:
+        sql_script = fd.read()
     # Replace variables with their values
     sql_script = _set_variables_value(sql_script, variables)
 
@@ -51,7 +46,4 @@ def modifies_database_state(sql_command: str) -> bool:
     Returns True if the given sql command modifies the current
     database state. Else returns False
     """
-    for cmd in settings.UPDATE_DATABASE_COMMANDS:
-        if cmd in sql_command:
-            return True
-    return False
+    return any(cmd in sql_command for cmd in settings.UPDATE_DATABASE_COMMANDS)

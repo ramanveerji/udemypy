@@ -14,13 +14,12 @@ from typing import Callable
 
 def connect() -> MySQLConnection:
     dbc = urlparse(settings.DATABASE_URL)
-    db = mysql.connector.connect(
+    return mysql.connector.connect(
         host=dbc.hostname,
         user=dbc.username,
         database=dbc.path.lstrip("/"),
         passwd=dbc.password,
     )
-    return db
 
 
 def database_access(function: Callable):
@@ -58,7 +57,7 @@ def execute_script(
         _time.sleep(settings.COMMAND_EXECUTION_SLEEP_TIME)
 
     # Save cursor output and close it
-    cursor_output = [output for output in cursor]
+    cursor_output = list(cursor)
     cursor.close()
 
     return cursor_output
@@ -115,28 +114,28 @@ def add_course_social_media(
 def retrieve_courses(db: MySQLConnection) -> list[course.Course]:
     """Retrieves all courses from database."""
     script_path = script.get_path("retrieve_courses.sql")
-    courses = []
-    for course_values in execute_script(db, script_path):
-        courses.append(course.Course(*course_values))
-    return courses
+    return [
+        course.Course(*course_values)
+        for course_values in execute_script(db, script_path)
+    ]
 
 
 def retrieve_courses_shared_to_twitter(db: MySQLConnection) -> list[course.Course]:
     """Retrieves courses that have been shared to Twitter."""
     script_path = script.get_path("retrieve_courses_shared_to_twitter.sql")
-    courses = []
-    for course_values in execute_script(db, script_path):
-        courses.append(course.Course(*course_values))
-    return courses
+    return [
+        course.Course(*course_values)
+        for course_values in execute_script(db, script_path)
+    ]
 
 
 def retrieve_courses_shared_to_telegram(db: MySQLConnection) -> list[course.Course]:
     """Retrieves courses that have been shared to Telegram."""
     script_path = script.get_path("retrieve_courses_shared_to_telegram.sql")
-    courses = []
-    for course_values in execute_script(db, script_path):
-        courses.append(course.Course(*course_values))
-    return courses
+    return [
+        course.Course(*course_values)
+        for course_values in execute_script(db, script_path)
+    ]
 
 
 def remove_course(db: MySQLConnection, course_id: int) -> None:
