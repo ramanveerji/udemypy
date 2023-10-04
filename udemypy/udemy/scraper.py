@@ -32,7 +32,7 @@ class _CoursesScraper(ABC):
 
     def _get_all(self, pages, website, tags, class_=None):
         self.courses = []
-        self.date = datetime.today()
+        self.date = datetime.now()
         all = []
         for page in range(1, pages + 1):
             response = requests.get(f"{website}{page}", headers=self.HEAD, verify=False)
@@ -61,13 +61,9 @@ class _CoursesScraper(ABC):
         try:
             course_id = self._get_course_id(link)
             coupon_code = link_list[1].split("=")[1]
-        except TypeError:
+        except (TypeError, IndexError):
             # Could not find course id
             return
-        except IndexError:
-            # Could not find course coupon
-            return
-
         self.courses.append(
             {
                 "id": course_id,
@@ -245,6 +241,4 @@ class StatsScraper:
             "div",
             class_=re.compile("udlite-badge udlite-heading-xs.*"),
         )
-        if not badge:
-            return None
-        return badge.text
+        return None if not badge else badge.text

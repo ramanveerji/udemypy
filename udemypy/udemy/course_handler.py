@@ -21,18 +21,16 @@ def _scrape_courses(pages: int) -> list[dict]:
 
 
 def _parse_courses(courses: list[dict]) -> list[course.Course]:
-    parsed_courses = []
-    for course_ in courses:
-        parsed_courses.append(
-            course.Course(
-                int(course_["id"]),
-                course_["title"],
-                course_["link"],
-                course_["coupon_code"],
-                course_["date_found"],
-            )
+    return [
+        course.Course(
+            int(course_["id"]),
+            course_["title"],
+            course_["link"],
+            course_["coupon_code"],
+            course_["date_found"],
         )
-    return parsed_courses
+        for course_ in courses
+    ]
 
 
 def _delete_shared_courses(
